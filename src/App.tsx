@@ -20,7 +20,7 @@ const App: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://192.168.56.1:3000/api/domain-chat",
+        "http://192.168.190.100:3000/api/domain-chat",
         {
           method: "POST",
           headers: {
