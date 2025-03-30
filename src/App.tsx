@@ -25,21 +25,16 @@ const App: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true", // Required for ngrok
-            "Authorization": "Bearer your_token_if_needed" // Optional auth
+            "ngrok-skip-browser-warning": "true" // Tetap diperlukan untuk ngrok
           },
           body: JSON.stringify({
-            user_input: input,
-            session_id: `react-session-${Date.now()}`,
+            user_input: input
           }),
         }
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.detail || `HTTP error! status: ${response.status}`
-        );
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -52,110 +47,104 @@ const App: React.FC = () => {
 
       setInput("");
     } catch (err) {
-      setError(
-        `Gagal mengirim pesan: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
-      console.error("Error details:", err);
+      setError("Gagal mengirim pesan. Coba lagi nanti.");
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 font-sans bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-center text-blue-600">
-        Chatbot with FastAPI
-      </h1>
-
-      {/* Chat Container */}
-      <div className="h-96 border border-gray-300 rounded-lg p-4 mb-4 overflow-y-auto flex flex-col bg-white shadow-sm">
-        {messages.length === 0 ? (
-          <div className="text-gray-500 text-center my-auto">
-            Mulai percakapan...
+    <div className="chat-container">
+      <h1>Chat App</h1>
+      
+      <div className="messages">
+        {messages.map((msg, index) => (
+          <div key={index} className={`message ${msg.sender}`}>
+            {msg.text}
           </div>
-        ) : (
-          messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`max-w-[80%] px-4 py-2 mb-3 rounded-2xl ${
-                msg.sender === "user"
-                  ? "self-end bg-blue-500 text-white"
-                  : "self-start bg-gray-100 text-gray-800"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))
-        )}
-        {loading && (
-          <div className="self-start bg-gray-100 text-gray-800 px-4 py-2 rounded-2xl">
-            Loading...
-          </div>
-        )}
+        ))}
+        {loading && <div className="message bot">Loading...</div>}
       </div>
 
-      {/* Error Display */}
-      {error && (
-        <div className="text-red-500 mb-3 p-2 bg-red-50 rounded-lg text-sm">
-          ⚠️ {error}
-        </div>
-      )}
+      {error && <div className="error">{error}</div>}
 
-      {/* Input Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex gap-2 sticky bottom-6 bg-white p-2 rounded-lg shadow-md"
-      >
+      <form onSubmit={handleSubmit}>
         <input
-          type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ketik pesan..."
+          placeholder="Type a message..."
           disabled={loading}
-          className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-        >
-          {loading ? (
-            <span className="flex items-center">
-              <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Mengirim...
-            </span>
-          ) : (
-            "Kirim"
-          )}
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send"}
         </button>
       </form>
-
-      {/* Debug Info */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
-        <p>Backend: 203e-114-4-213-24.ngrok-free.app</p>
-        <p>Status: {loading ? "Connecting..." : "Ready"}</p>
-      </div>
     </div>
   );
 };
+
+// CSS (simpan di file terpisah atau tambahkan di sini)
+const styles = `
+  .chat-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial;
+  }
+  
+  .messages {
+    height: 400px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  
+  .message {
+    max-width: 70%;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+  }
+  
+  .user {
+    background: #007bff;
+    color: white;
+    margin-left: auto;
+  }
+  
+  .bot {
+    background: #f1f1f1;
+    margin-right: auto;
+  }
+  
+  .error {
+    color: red;
+    margin: 10px 0;
+  }
+  
+  form {
+    display: flex;
+    gap: 10px;
+  }
+  
+  input {
+    flex: 1;
+    padding: 8px;
+  }
+  
+  button {
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+  }
+`;
+
+// Tambahkan CSS ke dokumen
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 export default App;
