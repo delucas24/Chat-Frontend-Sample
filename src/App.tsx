@@ -28,7 +28,7 @@ const App: React.FC = () => {
             "ngrok-skip-browser-warning": "true" // Tetap diperlukan untuk ngrok
           },
           body: JSON.stringify({
-            user_input: input
+            user_input: "apa itu ai"
           }),
         }
       );
