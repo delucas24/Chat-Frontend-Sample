@@ -20,7 +20,7 @@ const App: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://203e-114-4-213-24.ngrok-free.app/api/domain-chat",
+        "https://7c08-114-4-213-10.ngrok-free.app/api/domain-chat",
         {
           method: "POST",
           headers: {
@@ -28,7 +28,7 @@ const App: React.FC = () => {
             "ngrok-skip-browser-warning": "true" // Tetap diperlukan untuk ngrok
           },
           body: JSON.stringify({
-            user_input: "apa itu ai"
+            user_input: input
           }),
         }
       );
